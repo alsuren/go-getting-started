@@ -29,7 +29,7 @@ func dbFunc(c *gin.Context) {
 		}
 	}
 
-    rows, err := db.Query("SELECT id FROM users")
+    rows, err := db.Query("SELECT id FROM users WHERE last_seen > now() - '1 hour'::INTERVAL")
     if err != nil {
         c.String(http.StatusInternalServerError,
             fmt.Sprintf("Error reading ids: %q", err))
@@ -78,7 +78,7 @@ func forwardToUsers(bot *mbotapi.BotAPI, callback mbotapi.Callback) {
     }
 
     insertUser(callback.Sender.ID)
-    rows, err := db.Query("SELECT id FROM users")
+    rows, err := db.Query("SELECT id FROM users WHERE last_seen > now() - '1 hour'::INTERVAL")
     if err != nil {
         log.Printf("Error reading users: %q", err)
         return
