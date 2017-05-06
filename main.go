@@ -49,6 +49,41 @@ func dbFunc(c *gin.Context) {
     }
 }
 
+func setupUsers() {
+    if _, err := db.Exec("DROP TABLE users"); err != nil {
+        fmt.Printf("Error dropping database table: %q", err)
+    }
+    if _, err := db.Exec("CREATE TABLE IF NOT EXISTS users (last_seen timestamp, id bigint)"); err != nil {
+        fmt.Printf("Error creating database table: %q", err)
+    }
+}
+
+func forwardToUsers(bot *mbotapi.BotAPI, callback mbotapi.Callback) {
+    log.Printf("[%#v] %s", callback.Sender, callback.Message.Text)
+
+    if _, err := db.Exec("INSERT INTO users VALUES (now(), ?) ON CONFLICT DO UPDATE", callback.Sender.ID); err != nil {
+        fmt.Printf("Error adding user: %q", err)
+        return
+    }
+    rows, err := db.Query("SELECT id FROM users")
+    if err != nil {
+        fmt.Printf("Error reading users: %q", err)
+        return
+    }
+    defer rows.Close()
+
+    msg := mbotapi.NewMessage(callback.Message.Text)
+    for rows.Next() {
+        var id int64
+        if err := rows.Scan(&id); err != nil {
+            fmt.Printf("Error scanning id: %q", err)
+            return
+        }
+        user := mbotapi.NewUserFromID(id)
+	    bot.Send(user, msg, mbotapi.RegularNotif)
+    }
+
+}
 
 func main() {
 	port := os.Getenv("PORT")
@@ -96,12 +131,11 @@ func main() {
     }
     router.GET("/db", dbFunc)
 
+    setupUsers()
+
 	go router.Run(":" + port)
 
 	for callback := range callbacks {
-        log.Printf("[%#v] %s", callback.Sender, callback.Message.Text)
-
-        msg := mbotapi.NewMessage(callback.Message.Text)
-        bot.Send(callback.Sender, msg, mbotapi.RegularNotif)
+		forwardToUsers(bot, callback)
     }
 }
