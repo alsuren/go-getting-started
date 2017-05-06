@@ -9,13 +9,13 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "p5QR+9bxiMQgUZUwpjJtFvBTooM=",
+			"checksumSHA1": "DE1s1wvbXkOJviX/W+QniODSLOY=",
 			"origin": "github.com/alsuren/go-messenger-bot",
 			"path": "github.com/abhinavdahiya/go-messenger-bot",
-			"revision": "44bceed70015356efec9cfaec644e2904bf8a9a8",
-			"revisionTime": "2017-05-06T19:52:30Z",
-			"version": "echo",
-			"versionExact": "echo"
+			"revision": "bf52650ca5dae5a9318a4c1effc420536445ced5",
+			"revisionTime": "2017-05-06T23:31:26Z",
+			"version": "fulluser",
+			"versionExact": "fulluser"
 		},
 		{
 			"checksumSHA1": "Qq7Gzany1n6gK6hpZQq9UXFhGGo=",
