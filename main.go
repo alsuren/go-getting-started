@@ -48,7 +48,7 @@ func setupUsers() {
 func forwardToUsers(bot *mbotapi.BotAPI, callback mbotapi.Callback) {
     log.Printf("[%#v] %s", callback.Sender, callback.Message.Text)
 
-    if _, err := db.Exec("INSERT INTO users VALUES (now(), ?) ON CONFLICT DO UPDATE", callback.Sender.ID); err != nil {
+    if _, err := db.Exec("INSERT INTO users VALUES (now(), ?) ON CONFLICT DO UPDATE SET timestamp=now()", callback.Sender.ID); err != nil {
         log.Printf("Error adding user: %q", err)
         return
     }
