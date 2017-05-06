@@ -72,6 +72,10 @@ func deleteUser(id int64) {
 
 func forwardToUsers(bot *mbotapi.BotAPI, callback mbotapi.Callback) {
     log.Printf("[%#v] %s", callback.Sender, callback.Message.Text)
+	if !callback.IsMessage() {
+		log.Printf("'twas just an echo")
+		return
+    }
 
     insertUser(callback.Sender.ID)
     rows, err := db.Query("SELECT id FROM users")

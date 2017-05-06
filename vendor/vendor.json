@@ -2,15 +2,20 @@
 	"comment": "",
 	"heroku": {
 		"goVersion": "go1.7.5",
-		"install": ["."]
+		"install": [
+			"."
+		]
 	},
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "kGYeuLGgpbTZmnOY4WFcUhnwoT0=",
+			"checksumSHA1": "p5QR+9bxiMQgUZUwpjJtFvBTooM=",
+			"origin": "github.com/alsuren/go-messenger-bot",
 			"path": "github.com/abhinavdahiya/go-messenger-bot",
-			"revision": "9044eb25e9a32a2c169c9af490cb6179f14a9289",
-			"revisionTime": "2017-02-20T17:54:36Z"
+			"revision": "44bceed70015356efec9cfaec644e2904bf8a9a8",
+			"revisionTime": "2017-05-06T19:52:30Z",
+			"version": "echo",
+			"versionExact": "echo"
 		},
 		{
 			"checksumSHA1": "Qq7Gzany1n6gK6hpZQq9UXFhGGo=",
