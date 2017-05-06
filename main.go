@@ -6,7 +6,6 @@ import (
 	"os"
     "database/sql"
     "fmt"
-    "time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/abhinavdahiya/go-messenger-bot"
@@ -18,43 +17,31 @@ var (
 )
 
 func dbFunc(c *gin.Context) {
-    if _, err := db.Exec("CREATE TABLE IF NOT EXISTS ticks (tick timestamp)"); err != nil {
-        c.String(http.StatusInternalServerError,
-            fmt.Sprintf("Error creating database table: %q", err))
-        return
-    }
-
-    if _, err := db.Exec("INSERT INTO ticks VALUES (now())"); err != nil {
-        c.String(http.StatusInternalServerError,
-            fmt.Sprintf("Error incrementing tick: %q", err))
-        return
-    }
-
-    rows, err := db.Query("SELECT tick FROM ticks")
+    rows, err := db.Query("SELECT id FROM users")
     if err != nil {
         c.String(http.StatusInternalServerError,
-            fmt.Sprintf("Error reading ticks: %q", err))
+            fmt.Sprintf("Error reading ids: %q", err))
         return
     }
 
     defer rows.Close()
     for rows.Next() {
-        var tick time.Time
-        if err := rows.Scan(&tick); err != nil {
+        var id int64
+        if err := rows.Scan(&id); err != nil {
           c.String(http.StatusInternalServerError,
-            fmt.Sprintf("Error scanning ticks: %q", err))
+            fmt.Sprintf("Error scanning id: %q", err))
             return
         }
-        c.String(http.StatusOK, fmt.Sprintf("Read from DB: %s\n", tick.String()))
+        c.String(http.StatusOK, fmt.Sprintf("Read from DB: %d\n", id))
     }
 }
 
 func setupUsers() {
-    if _, err := db.Exec("DROP TABLE users"); err != nil {
-        fmt.Printf("Error dropping database table: %q", err)
-    }
+    // if _, err := db.Exec("DROP TABLE users"); err != nil {
+    //     log.Printf("Error dropping database table: %q", err)
+    // }
     if _, err := db.Exec("CREATE TABLE IF NOT EXISTS users (last_seen timestamp, id bigint)"); err != nil {
-        fmt.Printf("Error creating database table: %q", err)
+        log.Printf("Error creating database table: %q", err)
     }
 }
 
@@ -62,12 +49,12 @@ func forwardToUsers(bot *mbotapi.BotAPI, callback mbotapi.Callback) {
     log.Printf("[%#v] %s", callback.Sender, callback.Message.Text)
 
     if _, err := db.Exec("INSERT INTO users VALUES (now(), ?) ON CONFLICT DO UPDATE", callback.Sender.ID); err != nil {
-        fmt.Printf("Error adding user: %q", err)
+        log.Printf("Error adding user: %q", err)
         return
     }
     rows, err := db.Query("SELECT id FROM users")
     if err != nil {
-        fmt.Printf("Error reading users: %q", err)
+        log.Printf("Error reading users: %q", err)
         return
     }
     defer rows.Close()
@@ -76,7 +63,7 @@ func forwardToUsers(bot *mbotapi.BotAPI, callback mbotapi.Callback) {
     for rows.Next() {
         var id int64
         if err := rows.Scan(&id); err != nil {
-            fmt.Printf("Error scanning id: %q", err)
+            log.Printf("Error scanning id: %q", err)
             return
         }
         user := mbotapi.NewUserFromID(id)
