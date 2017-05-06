@@ -119,6 +119,7 @@ func main() {
 
 	bot := mbotapi.NewBotAPI(access_token, webhook_verify_token, app_secret)
 	callbacks, mux := bot.SetWebhook("/webhook")
+	bot.Debug = true
 
 	router.GET("/webhook", gin.WrapH(mux))
 	router.POST("/webhook", gin.WrapH(mux))
